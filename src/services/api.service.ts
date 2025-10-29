@@ -13,8 +13,8 @@ import type {
 } from '@/types/order.types';
 import { mockOrdersResponse, mockFilterOptions } from '@/data/mockData';
 
-// Usa mock data se VITE_USE_MOCK_DATA=true o se l'API non è raggiungibile
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+// Usa mock data di default per la demo (cambia a false quando hai il backend)
+const USE_MOCK = true;
 
 /**
  * Configurazione del client API

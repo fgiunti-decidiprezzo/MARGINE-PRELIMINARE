@@ -1,0 +1,171 @@
+/**
+ * Stili per il componente OrderTable
+ */
+
+.table-container {
+  background: var(--color-bg-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Table actions */
+.table-actions {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--spacing-sm);
+  background-color: var(--color-bg-light);
+}
+
+.btn-table-action {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: var(--color-bg-white);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.btn-table-action:hover {
+  background-color: var(--color-bg-light);
+}
+
+/* Table scroll */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+}
+
+thead {
+  background-color: var(--color-bg-light);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th {
+  padding: var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+}
+
+td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Row parent (ordine) */
+.row-parent {
+  background-color: var(--color-bg-light);
+  font-weight: 600;
+}
+
+.row-parent:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.row-parent td:first-child {
+  border-left: 4px solid var(--color-primary);
+}
+
+/* Row child (spedizione) */
+.row-child {
+  background-color: var(--color-bg-white);
+  font-size: var(--font-size-base);
+}
+
+.row-child td:first-child {
+  padding-left: 40px;
+  border-left: 4px solid var(--color-border);
+}
+
+.row-child:hover {
+  background-color: var(--color-bg-light);
+}
+
+/* Toggle icon */
+.toggle-icon {
+  cursor: pointer;
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  user-select: none;
+}
+
+.toggle-icon:hover {
+  color: var(--color-primary);
+}
+
+/* Order date sotto l'ID */
+.order-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  font-weight: normal;
+  margin-top: 2px;
+}
+
+/* Cost tags */
+.cost-tag {
+  display: inline-block;
+  padding: 4px var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cost-tag.positive {
+  background-color: var(--color-tag-positive-bg);
+  color: var(--color-tag-positive-text);
+}
+
+.cost-tag.negative {
+  background-color: var(--color-tag-negative-bg);
+  color: var(--color-tag-negative-text);
+}
+
+/* Loading e empty states */
+.loading-message,
+.empty-message {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+}
+
+.loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  th,
+  td {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  .row-child td:first-child {
+    padding-left: var(--spacing-lg);
+  }
+}

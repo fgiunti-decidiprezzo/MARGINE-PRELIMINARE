@@ -12,9 +12,10 @@ import type {
   PaginationParams,
 } from '@/types/order.types';
 import { mockOrdersResponse, mockFilterOptions } from '@/data/mockData';
+import { supabaseService } from './supabase.service';
 
-// Usa mock data di default per la demo (cambia a false quando hai il backend)
-const USE_MOCK = true;
+// Modalità: 'mock' | 'supabase' | 'api'
+const MODE = (import.meta.env.VITE_DATA_SOURCE as 'mock' | 'supabase' | 'api') || 'mock';
 
 /**
  * Configurazione del client API
@@ -79,13 +80,19 @@ class ApiService {
     filters: OrderFilters = {},
     pagination: PaginationParams = { page: 1, pageSize: 50 }
   ): Promise<OrdersResponse> {
-    // Usa mock data se attivato
-    if (USE_MOCK) {
+    // Usa Supabase
+    if (MODE === 'supabase') {
+      return supabaseService.getOrders(filters, pagination);
+    }
+
+    // Usa mock data
+    if (MODE === 'mock') {
       return new Promise((resolve) => {
         setTimeout(() => resolve(mockOrdersResponse), 500);
       });
     }
 
+    // Usa API tradizionale
     const params = {
       ...filters,
       page: pagination.page,
@@ -121,13 +128,19 @@ class ApiService {
    * Recupera le opzioni disponibili per i filtri
    */
   async getFilterOptions(): Promise<FilterOptions> {
-    // Usa mock data se attivato
-    if (USE_MOCK) {
+    // Usa Supabase
+    if (MODE === 'supabase') {
+      return supabaseService.getFilterOptions();
+    }
+
+    // Usa mock data
+    if (MODE === 'mock') {
       return new Promise((resolve) => {
         setTimeout(() => resolve(mockFilterOptions), 300);
       });
     }
 
+    // Usa API tradizionale
     const response = await this.client.get<FilterOptions>('/filter-options');
     return response.data;
   }

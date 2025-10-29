@@ -2,6 +2,13 @@
 
 Sistema completo per l'analisi del margine operativo lordo preliminare degli ordini, con supporto per ordini multi-spedizione, filtri avanzati e calcolo automatico dei margini.
 
+## 🚀 Demo Live
+
+**Prova subito l'applicazione senza installare nulla:**
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/fgiunti-decidiprezzo/MARGINE-PRELIMINARE)
+[![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/fgiunti-decidiprezzo/MARGINE-PRELIMINARE)
+
 ## Caratteristiche Principali
 
 - **Analisi Margine Completa**: Visualizza ricavi, costi (incluse commissioni) e margini per ogni ordine

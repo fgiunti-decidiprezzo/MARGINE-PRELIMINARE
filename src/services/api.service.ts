@@ -11,6 +11,10 @@ import type {
   FilterOptions,
   PaginationParams,
 } from '@/types/order.types';
+import { mockOrdersResponse, mockFilterOptions } from '@/data/mockData';
+
+// Usa mock data se VITE_USE_MOCK_DATA=true o se l'API non è raggiungibile
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 /**
  * Configurazione del client API
@@ -75,6 +79,13 @@ class ApiService {
     filters: OrderFilters = {},
     pagination: PaginationParams = { page: 1, pageSize: 50 }
   ): Promise<OrdersResponse> {
+    // Usa mock data se attivato
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(mockOrdersResponse), 500);
+      });
+    }
+
     const params = {
       ...filters,
       page: pagination.page,
@@ -110,6 +121,13 @@ class ApiService {
    * Recupera le opzioni disponibili per i filtri
    */
   async getFilterOptions(): Promise<FilterOptions> {
+    // Usa mock data se attivato
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(mockFilterOptions), 300);
+      });
+    }
+
     const response = await this.client.get<FilterOptions>('/filter-options');
     return response.data;
   }

@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import type { OrderFilters, FilterOptions } from '@/types/order.types';
+import type { OrderFilters } from '@/types/order.types';
 import { useFilterOptions } from '@/hooks/useFilterOptions';
 import { getCurrentMonthRange } from '@/utils/calculations';
 import './Filters.css';

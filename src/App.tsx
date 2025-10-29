@@ -2,7 +2,6 @@
  * Componente principale dell'applicazione
  */
 
-import React from 'react';
 import { OrderMarginAnalysis } from './components/OrderMarginAnalysis';
 
 function App() {

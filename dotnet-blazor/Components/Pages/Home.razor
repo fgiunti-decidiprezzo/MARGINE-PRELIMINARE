@@ -1,0 +1,275 @@
+@page "/"
+@inject MockDataService MockDataService
+@rendermode InteractiveServer
+
+<PageTitle>Analisi Margine Preliminare Ordini</PageTitle>
+
+<div class="container">
+    <!-- Pannello Filtri -->
+    <div class="filters-panel">
+        <h1>📊 Analisi Margine Preliminare Ordini</h1>
+
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Ricerca:</label>
+                <input type="text" @bind="filters.SearchQuery" placeholder="ID, Cliente, Tracking..." />
+            </div>
+
+            <div class="filter-group">
+                <label>Data Da:</label>
+                <input type="date" @bind="filters.DateFrom" />
+            </div>
+
+            <div class="filter-group">
+                <label>Data A:</label>
+                <input type="date" @bind="filters.DateTo" />
+            </div>
+
+            <div class="filter-group">
+                <label>Marketplace:</label>
+                <select @bind="filters.Marketplace">
+                    <option value="">Tutti</option>
+                    @foreach (var marketplace in marketplaces)
+                    {
+                        <option value="@marketplace">@marketplace</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Fornitore:</label>
+                <select @bind="filters.Supplier">
+                    <option value="">Tutti</option>
+                    @foreach (var supplier in suppliers)
+                    {
+                        <option value="@supplier">@supplier</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Magazzino:</label>
+                <select @bind="filters.Warehouse">
+                    <option value="">Tutti</option>
+                    @foreach (var warehouse in warehouses)
+                    {
+                        <option value="@warehouse">@warehouse</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Corriere:</label>
+                <select @bind="filters.Courier">
+                    <option value="">Tutti</option>
+                    @foreach (var courier in couriers)
+                    {
+                        <option value="@courier">@courier</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Costo Prodotto:</label>
+                <select @bind="filters.ProductCostStatus">
+                    <option value="">Tutti</option>
+                    <option value="OK">OK</option>
+                    <option value="KO">KO</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Costo Spedizione:</label>
+                <select @bind="filters.ShippingCostStatus">
+                    <option value="">Tutti</option>
+                    <option value="OK">OK</option>
+                    <option value="KO">KO</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" @onclick="ApplyFilters">🔍 Cerca</button>
+            <button class="btn btn-secondary" @onclick="ResetFilters">↺ Reset</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Tabella Ordini -->
+        <div class="table-panel">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>ID</th>
+                        <th>Marketplace</th>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Fornitore</th>
+                        <th>Magazzino</th>
+                        <th>Corriere</th>
+                        <th class="text-right">Val.Prod</th>
+                        <th class="text-right">Val.Sped</th>
+                        <th class="text-right">Sconti</th>
+                        <th class="text-right">Incassato</th>
+                        <th class="text-right">C.Prod</th>
+                        <th class="text-right">C.Sped</th>
+                        <th class="text-right">Comm.</th>
+                        <th class="text-right">Costi Tot</th>
+                        <th class="text-right">Margine €</th>
+                        <th class="text-right">Margine %</th>
+                        <th>C.Prod</th>
+                        <th>C.Sped</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in filteredOrders)
+                    {
+                        <tr class="order-row @GetRowClass(order.Margin.Value)">
+                            <td>
+                                @if (order.Shipments.Count > 0)
+                                {
+                                    <span class="expand-icon" @onclick="() => ToggleExpand(order)">
+                                        @(order.IsExpanded ? "▼" : "▶")
+                                    </span>
+                                }
+                            </td>
+                            <td>@order.Id</td>
+                            <td>@order.Marketplace</td>
+                            <td>@order.CustomerName</td>
+                            <td>@order.OrderDate?.ToString("dd/MM/yyyy")</td>
+                            <td>@order.Supplier</td>
+                            <td>@order.Warehouse</td>
+                            <td>@order.Courier</td>
+                            <td class="text-right">@order.Revenue.ProductValue.ToString("C2")</td>
+                            <td class="text-right">@order.Revenue.ShippingValue.ToString("C2")</td>
+                            <td class="text-right">@order.Revenue.Discounts.ToString("C2")</td>
+                            <td class="text-right">@order.Revenue.Total.ToString("C2")</td>
+                            <td class="text-right">@order.Costs.ProductCost.ToString("C2")</td>
+                            <td class="text-right">@order.Costs.ShippingCost.ToString("C2")</td>
+                            <td class="text-right">@order.Costs.Commissions.ToString("C2")</td>
+                            <td class="text-right">@order.Costs.Total.ToString("C2")</td>
+                            <td class="text-right">@order.Margin.Value.ToString("C2")</td>
+                            <td class="text-right">@order.Margin.Percentage.ToString("F2")%</td>
+                            <td><span class="badge @(order.HasValidProductCost ? "badge-ok" : "badge-ko")">@(order.HasValidProductCost ? "OK" : "KO")</span></td>
+                            <td><span class="badge @(order.HasValidShippingCost ? "badge-ok" : "badge-ko")">@(order.HasValidShippingCost ? "OK" : "KO")</span></td>
+                        </tr>
+
+                        @if (order.IsExpanded && order.Shipments.Count > 0)
+                        {
+                            @foreach (var shipment in order.Shipments)
+                            {
+                                <tr class="shipment-row @GetRowClass(shipment.Margin.Value, true)">
+                                    <td><span style="margin-left: 10px;">→</span></td>
+                                    <td>@shipment.TrackingNumber</td>
+                                    <td>@shipment.Marketplace</td>
+                                    <td>@shipment.CustomerName</td>
+                                    <td>@shipment.ShippingDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>@shipment.Courier</td>
+                                    <td class="text-right">@shipment.Revenue.ProductValue.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Revenue.ShippingValue.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Revenue.Discounts.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Revenue.Total.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Costs.ProductCost.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Costs.ShippingCost.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Costs.Commissions.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Costs.Total.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Margin.Value.ToString("C2")</td>
+                                    <td class="text-right">@shipment.Margin.Percentage.ToString("F2")%</td>
+                                    <td><span class="badge @(shipment.HasValidProductCost ? "badge-ok" : "badge-ko")">@(shipment.HasValidProductCost ? "OK" : "KO")</span></td>
+                                    <td><span class="badge @(shipment.HasValidShippingCost ? "badge-ok" : "badge-ko")">@(shipment.HasValidShippingCost ? "OK" : "KO")</span></td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pannello Statistiche -->
+        <div class="stats-panel">
+            <h2>📈 Statistiche</h2>
+
+            <div class="stat-card">
+                <div class="stat-label">Ordini Totali</div>
+                <div class="stat-value">@statistics.TotalOrders</div>
+            </div>
+
+            <div class="stat-card stat-positive">
+                <div class="stat-label">In Profitto</div>
+                <div class="stat-value">@statistics.ProfitableOrders (@statistics.ProfitablePercentage.ToString("F1")%)</div>
+            </div>
+
+            <div class="stat-card stat-negative">
+                <div class="stat-label">In Perdita</div>
+                <div class="stat-value">@statistics.LosingOrders (@statistics.LosingPercentage.ToString("F1")%)</div>
+            </div>
+
+            <div class="stat-card stat-highlight">
+                <div class="stat-label">Margine Totale</div>
+                <div class="stat-value">@statistics.TotalMargin.ToString("C2")</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Incassato</div>
+                <div class="stat-value">@statistics.TotalRevenue.ToString("C2")</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Costi Totali</div>
+                <div class="stat-value">@statistics.TotalCosts.ToString("C2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private OrderFilters filters = new();
+    private List<Order> filteredOrders = new();
+    private OrderStatistics statistics = new();
+
+    private List<string> marketplaces = new();
+    private List<string> suppliers = new();
+    private List<string> warehouses = new();
+    private List<string> couriers = new();
+
+    protected override void OnInitialized()
+    {
+        // Load filter options
+        marketplaces = MockDataService.GetMarketplaces();
+        suppliers = MockDataService.GetSuppliers();
+        warehouses = MockDataService.GetWarehouses();
+        couriers = MockDataService.GetCouriers();
+
+        // Load initial data
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredOrders = MockDataService.GetOrders(filters);
+        statistics = MockDataService.GetStatistics(filteredOrders);
+    }
+
+    private void ResetFilters()
+    {
+        filters = new OrderFilters();
+        ApplyFilters();
+    }
+
+    private void ToggleExpand(Order order)
+    {
+        order.IsExpanded = !order.IsExpanded;
+    }
+
+    private string GetRowClass(decimal margin, bool isShipment = false)
+    {
+        if (margin > 0)
+            return isShipment ? "row-profit-light" : "row-profit";
+        if (margin < 0)
+            return isShipment ? "row-loss-light" : "row-loss";
+        return isShipment ? "row-zero-light" : "row-zero";
+    }
+}

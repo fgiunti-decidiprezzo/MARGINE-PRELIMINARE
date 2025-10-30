@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Pannello Filtri */
+.filters-panel {
+    background: white;
+    padding: 20px;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filters-panel h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: #1e90ff;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #1e90ff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1873cc;
+}
+
+.btn-secondary {
+    background: #808080;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #666;
+}
+
+/* Content Area */
+.content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Tabella Ordini */
+.table-panel {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background: white;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.orders-table thead th {
+    background: #424242;
+    color: white;
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.orders-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.orders-table .text-right {
+    text-align: right;
+}
+
+.order-row {
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.order-row:hover {
+    opacity: 0.8;
+}
+
+.shipment-row {
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.row-profit {
+    background: #c8e6c9;
+}
+
+.row-loss {
+    background: #ffcdd2;
+}
+
+.row-zero {
+    background: #e0e0e0;
+}
+
+.row-profit-light {
+    background: #e8f5e9;
+}
+
+.row-loss-light {
+    background: #ffebee;
+}
+
+.row-zero-light {
+    background: #f5f5f5;
+}
+
+.expand-icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.badge-ok {
+    background: #4caf50;
+    color: white;
+}
+
+.badge-ko {
+    background: #ff9800;
+    color: white;
+}
+
+/* Pannello Statistiche */
+.stats-panel {
+    width: 320px;
+    background: #e3f2fd;
+    border-left: 2px solid #2196f3;
+    padding: 20px;
+    overflow: auto;
+}
+
+.stats-panel h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #1565c0;
+}
+
+.stat-card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-positive .stat-value {
+    color: #2e7d32;
+}
+
+.stat-negative .stat-value {
+    color: #c62828;
+}
+
+.stat-highlight {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-highlight .stat-label,
+.stat-highlight .stat-value {
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .filters-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .stats-panel {
+        width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .stats-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 2px solid #2196f3;
+    }
+
+    .orders-table {
+        font-size: 11px;
+    }
+
+    .orders-table td,
+    .orders-table th {
+        padding: 6px 4px;
+    }
+}

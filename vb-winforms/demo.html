@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Analisi Margine Preliminare Ordini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .filters-panel {
+            background: #e8e8e8;
+            padding: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .filters-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-search {
+            background: #1e90ff;
+            color: white;
+        }
+
+        .btn-search:hover {
+            background: #1873cc;
+        }
+
+        .btn-reset {
+            background: #808080;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #666;
+        }
+
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .table-panel {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: white;
+        }
+
+        .stats-panel {
+            width: 300px;
+            background: #e0f7fa;
+            border-left: 2px solid #00acc1;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .stats-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #00695c;
+        }
+
+        .stat-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .stat-positive {
+            color: #2e7d32;
+        }
+
+        .stat-negative {
+            color: #c62828;
+        }
+
+        .stat-neutral {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #424242;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr.order-row {
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        tr.order-row:hover {
+            opacity: 0.9;
+        }
+
+        tr.shipment-row {
+            font-weight: normal;
+            font-size: 12px;
+        }
+
+        .row-profit {
+            background: #c8e6c9;
+        }
+
+        .row-loss {
+            background: #ffcdd2;
+        }
+
+        .row-zero {
+            background: #e0e0e0;
+        }
+
+        .row-profit-light {
+            background: #e8f5e9;
+        }
+
+        .row-loss-light {
+            background: #ffebee;
+        }
+
+        .row-zero-light {
+            background: #f5f5f5;
+        }
+
+        .expand-icon {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .status-ok {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-ko {
+            background: #ff9800;
+            color: white;
+        }
+
+        .currency {
+            text-align: right;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Pannello Filtri -->
+        <div class="filters-panel">
+            <div class="filters-title">📊 Analisi Margine Preliminare Ordini - Windows Forms Demo</div>
+
+            <div class="note">
+                <strong>⚠️ NOTA:</strong> Questa è una demo HTML che simula l'interfaccia Windows Forms.
+                La vera applicazione VB.NET ha funzionalità complete e deve essere eseguita in Visual Studio su Windows.
+            </div>
+
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Ricerca:</label>
+                    <input type="text" id="searchBox" placeholder="ID, Cliente, Tracking...">
+                </div>
+
+                <div class="filter-group">
+                    <label>Marketplace:</label>
+                    <select id="marketplaceFilter">
+                        <option>Tutti</option>
+                        <option>Amazon</option>
+                        <option>eBay</option>
+                        <option>Sito Web</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Fornitore:</label>
+                    <select id="supplierFilter">
+                        <option>Tutti</option>
+                        <option>Fornitore A</option>
+                        <option>Fornitore B</option>
+                        <option>Fornitore C</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Magazzino:</label>
+                    <select id="warehouseFilter">
+                        <option>Tutti</option>
+                        <option>Milano</option>
+                        <option>Roma</option>
+                        <option>Torino</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Corriere:</label>
+                    <select id="courierFilter">
+                        <option>Tutti</option>
+                        <option>DHL</option>
+                        <option>UPS</option>
+                        <option>FedEx</option>
+                        <option>BRT</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Costo Prodotto:</label>
+                    <select id="productCostFilter">
+                        <option>Tutti</option>
+                        <option>OK</option>
+                        <option>KO</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-search" onclick="applyFilters()">🔍 Cerca</button>
+                <button class="btn btn-reset" onclick="resetFilters()">↺ Reset</button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Tabella Ordini -->
+            <div class="table-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>ID Ordine</th>
+                            <th>Marketplace</th>
+                            <th>Cliente</th>
+                            <th>Data</th>
+                            <th>Fornitore</th>
+                            <th>Magazzino</th>
+                            <th>Corriere</th>
+                            <th class="currency">Val. Prodotto</th>
+                            <th class="currency">Val. Sped.</th>
+                            <th class="currency">Sconti</th>
+                            <th class="currency">Incassato</th>
+                            <th class="currency">Costo Prod.</th>
+                            <th class="currency">Costo Sped.</th>
+                            <th class="currency">Commissioni</th>
+                            <th class="currency">Costi Tot.</th>
+                            <th class="currency">Margine €</th>
+                            <th class="currency">Margine %</th>
+                            <th>C.Prod</th>
+                            <th>C.Sped</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pannello Statistiche -->
+            <div class="stats-panel">
+                <div class="stats-title">📈 Statistiche</div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Ordini Totali</div>
+                    <div class="stat-value stat-neutral" id="statTotalOrders">5</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">In Profitto</div>
+                    <div class="stat-value stat-positive" id="statProfitable">2 (40.0%)</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">In Perdita</div>
+                    <div class="stat-value stat-negative" id="statLosing">2 (40.0%)</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Margine Totale</div>
+                    <div class="stat-value stat-positive" id="statTotalMargin">€69.14</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Incassato</div>
+                    <div class="stat-value stat-neutral" id="statTotalRevenue">€1,465.00</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Costi Totali</div>
+                    <div class="stat-value stat-neutral" id="statTotalCosts">€1,395.86</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Data
+        const mockOrders = [
+            {
+                id: "ORD-001",
+                marketplace: "Amazon",
+                customer: "Mario Rossi",
+                orderDate: "15/01/2024",
+                supplier: "Fornitore A",
+                warehouse: "Milano",
+                courier: "DHL",
+                productValue: 250.00,
+                shippingValue: 15.00,
+                discounts: 0.00,
+                revenueTotal: 265.00,
+                productCost: 180.00,
+                shippingCost: 12.00,
+                commissions: 26.50,
+                costsTotal: 218.50,
+                marginValue: 46.50,
+                marginPercentage: 17.55,
+                productCostValid: true,
+                shippingCostValid: true,
+                shipments: []
+            },
+            {
+                id: "ORD-002",
+                marketplace: "eBay",
+                customer: "Laura Bianchi",
+                orderDate: "18/01/2024",
+                supplier: "Fornitore B",
+                warehouse: "Roma",
+                courier: "UPS",
+                productValue: 180.00,
+                shippingValue: 12.00,
+                discounts: 15.00,
+                revenueTotal: 177.00,
+                productCost: 150.00,
+                shippingCost: 30.50,
+                commissions: 18.18,
+                costsTotal: 198.68,
+                marginValue: -21.68,
+                marginPercentage: -12.25,
+                productCostValid: false,
+                shippingCostValid: true,
+                shipments: []
+            },
+            {
+                id: "ORD-003",
+                marketplace: "Sito Web",
+                customer: "Giuseppe Verdi",
+                orderDate: "20/01/2024",
+                supplier: "Fornitore C",
+                warehouse: "Torino",
+                courier: "FedEx",
+                productValue: 500.00,
+                shippingValue: 0.00,
+                discounts: 50.00,
+                revenueTotal: 450.00,
+                productCost: 400.00,
+                shippingCost: 5.00,
+                commissions: 45.00,
+                costsTotal: 450.00,
+                marginValue: 0.00,
+                marginPercentage: 0.00,
+                productCostValid: true,
+                shippingCostValid: true,
+                shipments: []
+            },
+            {
+                id: "ORD-004",
+                marketplace: "Amazon",
+                customer: "Anna Ferrari",
+                orderDate: "22/01/2024",
+                supplier: "Fornitore A",
+                warehouse: "Milano",
+                courier: "BRT",
+                productValue: 320.00,
+                shippingValue: 18.00,
+                discounts: 0.00,
+                revenueTotal: 338.00,
+                productCost: 220.00,
+                shippingCost: 12.00,
+                commissions: 34.00,
+                costsTotal: 266.00,
+                marginValue: 72.00,
+                marginPercentage: 21.30,
+                productCostValid: true,
+                shippingCostValid: true,
+                shipments: []
+            },
+            {
+                id: "ORD-005",
+                marketplace: "eBay",
+                customer: "Marco Gialli",
+                orderDate: "25/01/2024",
+                supplier: "Fornitore B",
+                warehouse: "Roma",
+                courier: "DHL",
+                productValue: 150.00,
+                shippingValue: 10.00,
+                discounts: 5.00,
+                revenueTotal: 155.00,
+                productCost: 130.00,
+                shippingCost: 35.00,
+                commissions: 17.68,
+                costsTotal: 182.68,
+                marginValue: -27.68,
+                marginPercentage: -17.86,
+                productCostValid: true,
+                shippingCostValid: false,
+                shipments: []
+            }
+        ];
+
+        let currentOrders = [...mockOrders];
+        let expandedOrders = new Set();
+
+        function formatCurrency(value) {
+            return '€' + value.toFixed(2);
+        }
+
+        function getRowClass(margin, isShipment = false) {
+            if (margin > 0) return isShipment ? 'row-profit-light' : 'row-profit';
+            if (margin < 0) return isShipment ? 'row-loss-light' : 'row-loss';
+            return isShipment ? 'row-zero-light' : 'row-zero';
+        }
+
+        function renderOrders() {
+            const tbody = document.getElementById('ordersTable');
+            tbody.innerHTML = '';
+
+            currentOrders.forEach(order => {
+                const isExpanded = expandedOrders.has(order.id);
+                const hasShipments = order.shipments && order.shipments.length > 0;
+
+                const tr = document.createElement('tr');
+                tr.className = 'order-row ' + getRowClass(order.marginValue);
+                tr.innerHTML = `
+                    <td><span class="expand-icon">${hasShipments ? (isExpanded ? '▼' : '▶') : ''}</span></td>
+                    <td>${order.id}</td>
+                    <td>${order.marketplace}</td>
+                    <td>${order.customer}</td>
+                    <td>${order.orderDate}</td>
+                    <td>${order.supplier}</td>
+                    <td>${order.warehouse}</td>
+                    <td>${order.courier}</td>
+                    <td class="currency">${formatCurrency(order.productValue)}</td>
+                    <td class="currency">${formatCurrency(order.shippingValue)}</td>
+                    <td class="currency">${formatCurrency(order.discounts)}</td>
+                    <td class="currency">${formatCurrency(order.revenueTotal)}</td>
+                    <td class="currency">${formatCurrency(order.productCost)}</td>
+                    <td class="currency">${formatCurrency(order.shippingCost)}</td>
+                    <td class="currency">${formatCurrency(order.commissions)}</td>
+                    <td class="currency">${formatCurrency(order.costsTotal)}</td>
+                    <td class="currency">${formatCurrency(order.marginValue)}</td>
+                    <td class="currency">${order.marginPercentage.toFixed(2)}%</td>
+                    <td><span class="status-badge status-${order.productCostValid ? 'ok' : 'ko'}">${order.productCostValid ? 'OK' : 'KO'}</span></td>
+                    <td><span class="status-badge status-${order.shippingCostValid ? 'ok' : 'ko'}">${order.shippingCostValid ? 'OK' : 'KO'}</span></td>
+                `;
+
+                if (hasShipments) {
+                    tr.querySelector('.expand-icon').onclick = () => toggleExpand(order.id);
+                }
+
+                tbody.appendChild(tr);
+
+                // Render shipments if expanded
+                if (isExpanded && hasShipments) {
+                    order.shipments.forEach(shipment => {
+                        const shipTr = document.createElement('tr');
+                        shipTr.className = 'shipment-row ' + getRowClass(shipment.marginValue, true);
+                        shipTr.innerHTML = `
+                            <td><span style="margin-left: 10px;">→</span></td>
+                            <td>${shipment.trackingNumber}</td>
+                            <td>${shipment.marketplace}</td>
+                            <td>${shipment.customer}</td>
+                            <td>${shipment.shippingDate}</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>${shipment.courier}</td>
+                            <td class="currency">${formatCurrency(shipment.productValue)}</td>
+                            <td class="currency">${formatCurrency(shipment.shippingValue)}</td>
+                            <td class="currency">${formatCurrency(shipment.discounts)}</td>
+                            <td class="currency">${formatCurrency(shipment.revenueTotal)}</td>
+                            <td class="currency">${formatCurrency(shipment.productCost)}</td>
+                            <td class="currency">${formatCurrency(shipment.shippingCost)}</td>
+                            <td class="currency">${formatCurrency(shipment.commissions)}</td>
+                            <td class="currency">${formatCurrency(shipment.costsTotal)}</td>
+                            <td class="currency">${formatCurrency(shipment.marginValue)}</td>
+                            <td class="currency">${shipment.marginPercentage.toFixed(2)}%</td>
+                            <td><span class="status-badge status-${shipment.productCostValid ? 'ok' : 'ko'}">${shipment.productCostValid ? 'OK' : 'KO'}</span></td>
+                            <td><span class="status-badge status-${shipment.shippingCostValid ? 'ok' : 'ko'}">${shipment.shippingCostValid ? 'OK' : 'KO'}</span></td>
+                        `;
+                        tbody.appendChild(shipTr);
+                    });
+                }
+            });
+
+            updateStatistics();
+        }
+
+        function toggleExpand(orderId) {
+            if (expandedOrders.has(orderId)) {
+                expandedOrders.delete(orderId);
+            } else {
+                expandedOrders.add(orderId);
+            }
+            renderOrders();
+        }
+
+        function updateStatistics() {
+            const total = currentOrders.length;
+            const profitable = currentOrders.filter(o => o.marginValue > 0).length;
+            const losing = currentOrders.filter(o => o.marginValue < 0).length;
+
+            const totalMargin = currentOrders.reduce((sum, o) => sum + o.marginValue, 0);
+            const totalRevenue = currentOrders.reduce((sum, o) => sum + o.revenueTotal, 0);
+            const totalCosts = currentOrders.reduce((sum, o) => sum + o.costsTotal, 0);
+
+            document.getElementById('statTotalOrders').textContent = total;
+            document.getElementById('statProfitable').textContent = `${profitable} (${(profitable/total*100).toFixed(1)}%)`;
+            document.getElementById('statLosing').textContent = `${losing} (${(losing/total*100).toFixed(1)}%)`;
+            document.getElementById('statTotalMargin').textContent = formatCurrency(totalMargin);
+            document.getElementById('statTotalRevenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('statTotalCosts').textContent = formatCurrency(totalCosts);
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const marketplace = document.getElementById('marketplaceFilter').value;
+            const supplier = document.getElementById('supplierFilter').value;
+            const warehouse = document.getElementById('warehouseFilter').value;
+            const courier = document.getElementById('courierFilter').value;
+            const productCost = document.getElementById('productCostFilter').value;
+
+            currentOrders = mockOrders.filter(order => {
+                if (searchTerm && !order.id.toLowerCase().includes(searchTerm) &&
+                    !order.customer.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                if (marketplace !== 'Tutti' && order.marketplace !== marketplace) return false;
+                if (supplier !== 'Tutti' && order.supplier !== supplier) return false;
+                if (warehouse !== 'Tutti' && order.warehouse !== warehouse) return false;
+                if (courier !== 'Tutti' && order.courier !== courier) return false;
+                if (productCost === 'OK' && !order.productCostValid) return false;
+                if (productCost === 'KO' && order.productCostValid) return false;
+
+                return true;
+            });
+
+            renderOrders();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchBox').value = '';
+            document.getElementById('marketplaceFilter').selectedIndex = 0;
+            document.getElementById('supplierFilter').selectedIndex = 0;
+            document.getElementById('warehouseFilter').selectedIndex = 0;
+            document.getElementById('courierFilter').selectedIndex = 0;
+            document.getElementById('productCostFilter').selectedIndex = 0;
+
+            currentOrders = [...mockOrders];
+            renderOrders();
+        }
+
+        // Initial render
+        renderOrders();
+    </script>
+</body>
+</html>

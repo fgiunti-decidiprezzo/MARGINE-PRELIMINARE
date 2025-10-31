@@ -1,0 +1,72 @@
+/**
+ * Stili per il componente Statistics
+ */
+
+.stats-section {
+  flex: 1;
+  min-width: 280px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-box {
+  background: var(--color-bg-white);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-box.positive {
+  border-left: 3px solid var(--color-positive);
+}
+
+.stat-box.negative {
+  border-left: 3px solid var(--color-negative);
+}
+
+.stat-box.neutral {
+  border-left: 3px solid var(--color-neutral);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stat-box.positive .stat-value {
+  color: var(--color-positive);
+}
+
+.stat-box.negative .stat-value {
+  color: var(--color-negative);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-section {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

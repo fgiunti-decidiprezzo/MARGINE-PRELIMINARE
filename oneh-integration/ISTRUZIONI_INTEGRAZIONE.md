@@ -18,22 +18,22 @@ Aprire `src/config/modules.js` e aggiungere:
 
 ```js
 // In cima, aggiungere l'import dell'icona:
-import { TrendingUp } from 'lucide-react'
+import { Calculator } from 'lucide-react'
 
 // Nell'array MODULES, aggiungere:
 {
   slug: 'margine-preliminare',
-  name: 'Margine Preliminare',
-  category: 'ordini',
+  name: 'Controllo Marginalità Vendite',
+  category: 'admin',
   path: '/margine-preliminare',
-  icon: TrendingUp,
+  icon: Calculator,
   description: 'Analisi margine operativo lordo preliminare ordini.',
   color: {
-    gradient: 'from-emerald-500 to-emerald-700',
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
-    hoverBorder: 'hover:border-emerald-400',
+    gradient: 'from-cyan-500 to-cyan-700',
+    bg: 'bg-cyan-50',
+    text: 'text-cyan-700',
+    border: 'border-cyan-200',
+    hoverBorder: 'hover:border-cyan-400',
   },
   component: () => import('../modules/margine-preliminare/MarginePreliminareApp'),
 },
@@ -48,30 +48,9 @@ migrations/015_margine_preliminare.sql
 
 ### 4. Configurare i permessi
 
-Trovare l'UUID di Gaetano Simonetti nella tabella `users`:
-```sql
-SELECT id, email, name FROM users WHERE name ILIKE '%gaetano%simonetti%';
-```
-
-Poi assegnare il permesso **full** (unico utente che può modificare):
-```sql
-INSERT INTO app_permissions (user_id, app_slug, level)
-VALUES ('UUID_DI_GAETANO', 'margine-preliminare', 'full');
-```
-
-Per tutti gli altri utenti che devono **solo visualizzare**:
-```sql
-INSERT INTO app_permissions (user_id, app_slug, level)
-VALUES ('UUID_UTENTE', 'margine-preliminare', 'readonly');
-```
-
-Oppure, per dare readonly a tutti gli utenti in un colpo solo:
-```sql
-INSERT INTO app_permissions (user_id, app_slug, level)
-SELECT id, 'margine-preliminare', 'readonly'
-FROM users
-WHERE id != 'UUID_DI_GAETANO';
-```
+I permessi sono inclusi nella migration SQL (eseguita automaticamente):
+- **Gaetano Simonetti** (`f8dffb65-9ae8-43a4-9139-d5466ceb0dc9`) → `full`
+- **Tutti gli altri** → `readonly`
 
 ### 5. Deploy
 
@@ -113,4 +92,4 @@ migrations/
 - Il componente usa `useAuth()` e `usePermissions()` dal sistema auth oneh-solutions
 - Permessi: `canEdit` controlla se mostrare i pulsanti export (solo per level `full`)
 - I dati usano nomi colonna snake_case (standard Supabase), NON camelCase
-- Il servizio Supabase importa da `../../../lib/supabase` (client condiviso oneh-solutions)
+- Il servizio Supabase crea il client localmente (pattern `occasioni/lib/supabase.js`)

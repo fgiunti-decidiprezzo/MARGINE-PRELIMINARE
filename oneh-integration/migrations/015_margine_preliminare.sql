@@ -115,13 +115,16 @@ CREATE TRIGGER mp_orders_updated_at
 -- =====================================================
 
 -- Gaetano Simonetti = accesso full (lettura + scrittura)
--- INSERT INTO app_permissions (user_id, app_slug, level)
--- VALUES ('UUID_GAETANO', 'margine-preliminare', 'full');
+INSERT INTO app_permissions (user_id, app_slug, level)
+VALUES ('f8dffb65-9ae8-43a4-9139-d5466ceb0dc9', 'margine-preliminare', 'full')
+ON CONFLICT DO NOTHING;
 
 -- Tutti gli altri utenti = readonly (vedono i dati ma non modificano)
--- Per ogni utente che deve vedere l'app:
--- INSERT INTO app_permissions (user_id, app_slug, level)
--- VALUES ('UUID_UTENTE', 'margine-preliminare', 'readonly');
+INSERT INTO app_permissions (user_id, app_slug, level)
+SELECT id, 'margine-preliminare', 'readonly'
+FROM users
+WHERE id != 'f8dffb65-9ae8-43a4-9139-d5466ceb0dc9'
+ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- Seed data di esempio (5 ordini)

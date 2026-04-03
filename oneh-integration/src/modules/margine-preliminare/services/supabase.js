@@ -1,11 +1,14 @@
 /**
  * Servizio Supabase — query ordini e spedizioni per Margine Preliminare
  *
- * Usa il client Supabase già inizializzato nell'app oneh-solutions.
- * Importa da '../../lib/supabase' (path standard del progetto).
+ * Usa il client Supabase locale al modulo (pattern occasioni/lib/supabase.js).
  */
 
-import { supabase } from '../../../lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 /**
  * Applica i filtri alla query ordini
